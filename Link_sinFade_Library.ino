@@ -238,7 +238,7 @@ void HSVwriteToLEDs(float someHSV[], int someZone) {  // <<< Includes whiteBalan
   RGB_from_hsv[1] = RGB_from_hsv[1] * GrnScaler / 100.0;  // GrnScaler = 77    //  67.0
   RGB_from_hsv[2] = RGB_from_hsv[2] * BluScaler / 100.0;  // BluScaler = 57    //  37.0
   for (byte led = 0; led < 3; led++) {
-    analogWrite(LunitZones[someZone][led], RGB_from_hsv[led]);  // Display color step.
+    PWM.set(LunitZones[someZone][led], RGB_from_hsv[led]);  // Display color step.
   }
 }
 //////////////////////////////////////////
