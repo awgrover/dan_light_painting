@@ -19,9 +19,9 @@ class PWM_TLC59711 : public PWM_Pins {
       enum {
         pwm1, pwm2, pwm3, pwm4, pwm5, pwm6, pwm7, pwm8, pwm9, pwm10, pwm11, pwm12
         };
+
     // For each pwm (e.g. pinMode())
     // Sadly, no sanity checks
-
     boolean begin(int pin) { 
       // only need to init the connection, not each pin
       if (! inited) {
