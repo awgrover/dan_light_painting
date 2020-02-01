@@ -2,7 +2,7 @@
 
 #include "PWM_Pins.h"
 
-class PWM_NativePin : PWM_Pins {
+class PWM_NativePin : public PWM_Pins {
   // interface for PWM's on the native pins
   // Acts like an object, but no storage, and inlines, so, efficient
 
