@@ -1,12 +1,19 @@
 //Fixed colors set as globals. 03-Pattern fades between them.
 const int RANDOMnoisePIN = A5; // for random seed
 const int BRIGHTNESS = 1;      // Value pot pin number
-const int SLOWNESS = 3;        // Pot pin number; 0 is fast, 1023 is slow. 
+const int SLOWNESS = 3;        // Pot pin number; 0 is fast, 1023 is slow.
+
+// Which LED interface?
+#include "PWM_NativePin.h"
+PWM_NativePin_MEGA PWM;
+
 // Pins for LEDs in each zone
-const byte aLunitPins[3] = {13, 12, 11};    // Zone A    >> Zone 1   {R, G, B}
-const byte bLunitPins[3] = {2, 3, 4};       // Zone B    >> Zone 2   {R, G, B}
-const byte cLunitPins[3] = {8, 9, 10};      // Zone C    >> Zone 3   {R, G, B}
-const byte dLunitPins[3] = {7, 6, 5};       // Zone D    >> Zone 4   {R, G, B}
+// You have to go look in the PWM class to figure out the physical pin
+// On the mega, pwm1 is pin 2, and increments till pwm12
+const byte aLunitPins[3] = {PWM.pwm12, PWM.pwm11, PWM.pwm10};    // Zone A    >> Zone 1   {R, G, B}
+const byte bLunitPins[3] = {PWM.pwm1, PWM.pwm2, PWM.pwm3};       // Zone B    >> Zone 2   {R, G, B}
+const byte cLunitPins[3] = {PWM.pwm7, PWM.pwm8, PWM.pwm9};      // Zone C    >> Zone 3   {R, G, B}
+const byte dLunitPins[3] = {PWM.pwm6, PWM.pwm5, PWM.pwm4};       // Zone D    >> Zone 4   {R, G, B}
 const byte *LunitZones[4] = {aLunitPins, bLunitPins, cLunitPins, dLunitPins}; // <<< fadeZone = 1, 2. 3, 4
 // Percent scaling for R vs G vs B for "White Balance" empirical values for LED strips. Used in HSVehtoRGB(HSVfColor, rgbf_color)
 // So, if Red is 100% there is no need for >>>  const float RednScaler = 100.0;
@@ -46,14 +53,15 @@ const int VAlRANGES[] = {0, 33,  58,  75,  86,  94, 100};
 //int n = 1;
 byte ZoneSet[4] = {1, 2, 3, 4}; // >>>change to: byte ZoneSet[4] = {0, 1, 2, 3};
 /////////////////////////////////////////////////////////////////////////
+
 void setup() {
   Serial.begin(9600);
   randomSeed(analogRead(RANDOMnoisePIN));
   for (byte led = 0; led < 3; led++) {
-    pinMode(aLunitPins[led], OUTPUT);
-    pinMode(bLunitPins[led], OUTPUT);
-    pinMode(cLunitPins[led], OUTPUT);
-    pinMode(dLunitPins[led], OUTPUT);
+    PWM.begin(aLunitPins[led]);
+    PWM.begin(bLunitPins[led]);
+    PWM.begin(cLunitPins[led]);
+    PWM.begin(dLunitPins[led]);
   }
   pinMode(BRIGHTNESS, INPUT);        // pin 1 is the Value (value) knob.
   pinMode(SLOWNESS, INPUT);          // pin 3 is the slowness knob.
@@ -303,7 +311,3 @@ void pattern06_loSatValShifter( ) {
   delayKnob(300);                                                                                         //   3D  med   light
   // Serial.println();
 }
-
-
-
-
