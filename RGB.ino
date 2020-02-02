@@ -5,7 +5,7 @@
     named fields: .red, .green, .blue
     aliased fields: .r, .g, .b
 
-    Analogous for HSV (hue/h, saturation|sat|s, value|val|v)
+    Analogous for HSV (hue|h, saturation|sat|s, value|val|v)
 
   You had:
     float RGB_from_hsv[3];
