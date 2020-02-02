@@ -6,6 +6,10 @@ const int SLOWNESS = 3;        // Pot pin number; 0 is fast, 1023 is slow.
 // Which LED interface?
 #include "PWM_TLC59711.h"
 PWM_TLC59711 PWM;
+/* 
+  #include "PWM_NativePin.h"
+  PWM_NativePin PWM;
+*/
 
 // Pins for LEDs in each zone
 // You have to go look in the PWM class to figure out the physical pin
