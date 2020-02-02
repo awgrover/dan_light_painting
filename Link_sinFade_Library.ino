@@ -1,14 +1,22 @@
 // Library of sinFade functions
 // Items in the commented heading below must be included in the linked sketch.
 /*  
-const int UNUSEDANALOG = A5;   // for random seed
 const int BRIGHTNESS = 1;      // Value pot pin number
 const int SLOWNESS = 3;        // 0 is fast, 1023 is slow. pot pin number
 
-// Pins for each zone
-const byte aLunitPins[3] = {6, 7, 8};        // Zone A   center  >> Zone 0   {R, G, B}
-const byte bLunitPins[3] = {2, 3, 4};        // Zone B   middle  >> Zone 1   {R, G, B}
-const byte cLunitPins[3] = {10, 11, 12};     // Zone C   outer   >> Zone 2   {R, G, B}
+// Which LED interface?
+#include "PWM_TLC59711.h"
+PWM_TLC59711 PWM;
+/* OR
+  #include "PWM_NativePin.h"
+  PWM_NativePin PWM;
+*/
+
+// Pins for each zone, using logical pins from the PWM set (see .h above)
+const byte aLunitPins[3] = {PWM.pwm12, PWM.pwm11, PWM.pwm10};    // Zone A    >> Zone 1   {R, G, B}
+const byte bLunitPins[3] = {PWM.pwm1, PWM.pwm2, PWM.pwm3};       // Zone B    >> Zone 2   {R, G, B}
+const byte cLunitPins[3] = {PWM.pwm7, PWM.pwm8, PWM.pwm9};      // Zone C    >> Zone 3   {R, G, B}
+const byte dLunitPins[3] = {PWM.pwm6, PWM.pwm5, PWM.pwm4};       // Zone D    >> Zone 4   {R, G, B}
 const byte *LunitZones[3] = {aLunitPins, bLunitPins, cLunitPins}; // <<< fadeZone = 0, 1, 2.
 
 // Percent scaling for R vs G vs B for "White Balance" empirical values for LED strips.

@@ -62,15 +62,19 @@ byte ZoneSet[4] = {1, 2, 3, 4}; // >>>change to: byte ZoneSet[4] = {0, 1, 2, 3};
 
 void setup() {
   Serial.begin(9600);
+
   randomSeed(analogRead(RANDOMnoisePIN));
+
   for (byte led = 0; led < 3; led++) {
     PWM.begin(aLunitPins[led]);
     PWM.begin(bLunitPins[led]);
     PWM.begin(cLunitPins[led]);
     PWM.begin(dLunitPins[led]);
   }
+
   pinMode(BRIGHTNESS, INPUT);        // pin 1 is the Value (value) knob.
   pinMode(SLOWNESS, INPUT);          // pin 3 is the slowness knob.
+
   //  This pattern(01) is placed in the "setup" section so it is used once.
   Serial.println(   "Starting Startup");
   // randHSVassign  (Asectors, AfiniHSV) ;
@@ -87,6 +91,7 @@ void loop() {
   byte m;
   byte i;
   byte cycle = random(0, 4);
+
   switch (cycle) {
     case 0:
       m = random(2, 4);
@@ -135,6 +140,7 @@ void loop() {
 //////////////////////////// rev. June 18, 2019 ///  How do I get in and out of each pattern??????
 void pattern03_FixedColorWalk ( ) {         // Change name to pattern03_SatColorWalk
   int rando = random(-120, 120);
+
   float aahsv[3] = {Ahsv[0] + rando, 100, 100};   // Test for Hue range? Yes.
   HSVcheckLimits(aahsv);
   float bbhsv[3] = {Bhsv[0] + rando, 100, 100};
