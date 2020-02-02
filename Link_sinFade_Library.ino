@@ -2,15 +2,14 @@
 // Items in the commented heading below must be included in the linked sketch.
 /*  
 const int BRIGHTNESS = 1;      // Value pot pin number
-const int SLOWNESS = 3;        // 0 is fast, 1023 is slow. pot pin number
+const int SLOWNESS = 3;        // pot: 0 is fast, 1023 is slow. pot pin number
 
 // Which LED interface?
 #include "PWM_TLC59711.h"
 PWM_TLC59711 PWM;
-/* OR
+// OR
   #include "PWM_NativePin.h"
   PWM_NativePin PWM;
-*/
 
 // Pins for each zone, using logical pins from the PWM set (see .h above)
 const byte aLunitPins[3] = {PWM.pwm12, PWM.pwm11, PWM.pwm10};    // Zone A    >> Zone 1   {R, G, B}
