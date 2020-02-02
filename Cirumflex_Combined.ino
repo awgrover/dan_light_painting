@@ -15,10 +15,12 @@ const byte bLunitPins[3] = {PWM.pwm1, PWM.pwm2, PWM.pwm3};       // Zone B    >>
 const byte cLunitPins[3] = {PWM.pwm7, PWM.pwm8, PWM.pwm9};      // Zone C    >> Zone 3   {R, G, B}
 const byte dLunitPins[3] = {PWM.pwm6, PWM.pwm5, PWM.pwm4};       // Zone D    >> Zone 4   {R, G, B}
 const byte *LunitZones[4] = {aLunitPins, bLunitPins, cLunitPins, dLunitPins}; // <<< fadeZone = 1, 2. 3, 4
+
 // Percent scaling for R vs G vs B for "White Balance" empirical values for LED strips. Used in HSVehtoRGB(HSVfColor, rgbf_color)
 // So, if Red is 100% there is no need for >>>  const float RednScaler = 100.0;
 const float GrnScaler = 42.0;   // <<Wht balance Entrance.  << 9/2018 - 80% 75%
 const float BluScaler = 72.0;   // <<Wht balance Entrance.  << 9/2018 - 65% 55%
+
 //  /*  ////
 const float Ahsv[3] = { 3, 100, 100};
 const float Bhsv[3] = { 49, 100, 100};

@@ -11,6 +11,8 @@ class PWM_TLC59711 : public PWM_Pins {
   // We use the default clock/data pins for SPI.
 
   public:
+    static constexpr int RANGE = 2^16 - 1;
+
     // just do 1 for now
     Adafruit_TLC59711 tlc = Adafruit_TLC59711(NUM_TLC59711); // default spi clock/data
     boolean inited = false;
@@ -36,7 +38,8 @@ class PWM_TLC59711 : public PWM_Pins {
 
     // Give it a pin and int and you get PWM
     void set(int pin, int brightness) { tlc.setPWM(pin, brightness); }
-    void set(int pin, float brightness) { set(pin, (int) brightness); } // tolerate float
+    // A float is 0.0 ... 1.0, which will be mapped to the RANGE
+    void set(int pin, float brightness) { set(pin, (int) brightness * RANGE); }
 
     void commit() { tlc.write(); }
   };
