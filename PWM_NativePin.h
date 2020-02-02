@@ -7,6 +7,7 @@ class PWM_NativePin : public PWM_Pins {
   // Acts like an object, but no storage, and inlines, so, efficient
 
   public:
+    static constexpr int RANGE = 255;
 
     // For each pwm (e.g. pinMode())
     // Sadly, no sanity checks
@@ -17,7 +18,8 @@ class PWM_NativePin : public PWM_Pins {
 
     // Give it a pin and int and you get PWM
     void set(int pin, int brightness) { analogWrite(pin, brightness); }
-    void set(int pin, float brightness) { set(pin, (int) brightness); } // tolerate float
+    // A float is 0.0 ... 1.0, which will be mapped to the RANGE
+    void set(int pin, float brightness) { set(pin, (int) brightness * RANGE); }
 
     // commit is a no-op
     void commit() {}
