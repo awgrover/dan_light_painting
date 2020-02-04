@@ -240,6 +240,7 @@ void HSVwriteToLEDs(float someHSV[], int someZone) {  // <<< Includes whiteBalan
   for (byte led = 0; led < 3; led++) {
     PWM.set(LunitZones[someZone][led], RGB_from_hsv[led]);  // Display color step.
   }
+  PWM.commit(); // for spi/i2c devices, try to batch more updates at once
 }
 //////////////////////////////////////////
 void whiteBalance (float colorRGB[]) {
