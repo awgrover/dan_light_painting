@@ -1,6 +1,8 @@
 #pragma once
 
-class PWM_NativePin {
+#include "PWM_Pins.h"
+
+class PWM_NativePin : public PWM_Pins {
   // interface for PWM's on the native pins
   // Acts like an object, but no storage, and inlines, so, efficient
 
@@ -14,8 +16,11 @@ class PWM_NativePin {
     }
 
     // Give it a pin and int and you get PWM
-    static void set(int pin, int state) { analogWrite(pin, state); }
-    static void set(int pin, float state) { set(pin, (int) state); } // tolerate float
+    void set(int pin, int brightness) { analogWrite(pin, brightness); }
+    void set(int pin, float brightness) { set(pin, (int) brightness); } // tolerate float
+
+    // commit is a no-op
+    void commit() {}
   };
 
 class PWM_NativePin_Uno : public PWM_NativePin {
