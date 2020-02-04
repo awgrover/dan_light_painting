@@ -1,4 +1,3 @@
-
 // Library of sinFade functions
 // Items in the commented heading below must be included in the linked sketch.
 /*  
@@ -32,10 +31,12 @@ void HSV_sinFade_Retain_1Z (float Steps, int fadeZone, float startHSV[], float H
   for (int Stepr = 0; Stepr <= Steps; Stepr++) {    ///////////// <<<<<<<<<<<<  START FADE
 
     if (! (Stepr % 10) ) {          // modulo operator % returns the remainder, e.g.: 10 % 2 = 0. 10 % 3 = 1.
+      // FIXME: should this be a map()? looks like a 0..1
       ValKnob = analogRead(BRIGHTNESS) / 1043.9 + 0.02;            // analogRead is slow, so do every 10th
     }                                                              //<< Knob reads value 0 to 1023.
     localHSV[0] = startHSV[0] + (1 - cos(radians(Stepr * 180.0 / Steps))) * HueDegrees / 2 ;
     localHSV[1] = startHSV[1] + (1 - cos(radians(Stepr * 180.0 / Steps))) * (newSat - startHSV[1]) / 2 ;
+    // value, so brightness goes here (fixme: move to the PWM class)
     localHSV[2] = (startHSV[2] + (1 - cos(radians(Stepr * 180.0 / Steps))) * (newVal - startHSV[2]) / 2 ) * ValKnob  ;
 
     HSVcheckLimits(localHSV);
@@ -233,10 +234,12 @@ void HSVcheckLimits(float hsvArray[])  {
 void HSVwriteToLEDs(float someHSV[], int someZone) {  // <<< Includes whiteBalance.
   float RGB_from_hsv[3];
   HSVehtoRGB(someHSV, RGB_from_hsv);              // Convert HSV to RGB on every iteration.
+
   //"White balance" is applied to the RGB form of the color HERE. Use RedScaler if needed.
   // colorRGB[0] = rgbf_color[0] * RedScaler / 100.0;  // RedScaler = 100   //  100.0
   RGB_from_hsv[1] = RGB_from_hsv[1] * GrnScaler / 100.0;  // GrnScaler = 77    //  67.0
   RGB_from_hsv[2] = RGB_from_hsv[2] * BluScaler / 100.0;  // BluScaler = 57    //  37.0
+
   for (byte led = 0; led < 3; led++) {
     PWM.set(LunitZones[someZone][led], RGB_from_hsv[led]);  // Display color step.
   }
@@ -260,62 +263,63 @@ void HSVehtoRGB(float HSVfColor[], float rgbf_color[]) {
   float Sat = HSVfColor[1];  // 0 to 100.
   float Val = HSVfColor[2];  // 0 to 100.
 
-  int rangeNumber = HSVehRange(HSVfColor);      ////////  Uses: HSVehRange(hsvColorF).  <<<< Can I do away with "rangeNumber" ?
+  // rgb's are in 0.0 ... 1.0
+  int rangeNumber = HSVehRange(HSVfColor);      ////////  Uses: HSVehRange(hsvColorF).  <<<< FIXME: Can I do away with "rangeNumber" ?
   switch (rangeNumber) {
     case 1:    // Range 1 - HuNum = 0 - 31 ... RGB - {255, xx, 0}   (Maj, Mid, Min)
-      rgbf_color[0] = Val * 2.55;                             // Maj
-      rgbf_color[1] = Val * (255 - Sat * (255 - 2.845 * Hue) / 100) / 100; // Mid
-      rgbf_color[2] = Val * 2.55 * (100 - Sat) / 100;         // Min
+      rgbf_color[0] = Val;                             // Maj
+      rgbf_color[1] = Val * (255 - Sat * (255 - 2.845 * Hue) / 100) / 100 / 255; // Mid (punt on 255 thing)
+      rgbf_color[2] = Val * (100 - Sat) / 100;         // Min
       break;
     case 2:    // Range 2  HSV[0]=32 to 87. ... RGB - {255, xx, 0}   (Maj, Mid, Min)
-      rgbf_color[0] = Val * 2.55;                                   // Maj
-      rgbf_color[1] = Val * (255 - Sat * (255 - 2.268 * (Hue + 11.438)) / 100) / 100; // Mid
-      rgbf_color[2] = Val * 2.55 * (100 - Sat) / 100;               // Min
+      rgbf_color[0] = Val;                                   // Maj
+      rgbf_color[1] = Val * (255 - Sat * (255 - 2.268 * (Hue + 11.438)) / 100) / 255; // Mid
+      rgbf_color[2] = Val * (100 - Sat) / 100;               // Min
       break;
     case 3:    //Range 3   HSV[0]=88 to 143...  RGB - {XX, 255, 0}     (Mid, Maj, Min)
-      rgbf_color[0] = Val * (255 - Sat * (3.0238 * (Hue - 16.669) - 255) / 100) / 100; // Mid
-      rgbf_color[1] = Val * 2.55;                                    // Maj
-      rgbf_color[2] = Val * (255 * (100 - Sat) / 100) / 100;         // Min
+      rgbf_color[0] = Val * (255 - Sat * (3.0238 * (Hue - 16.669) - 255) / 100) / 255; // Mid
+      rgbf_color[1] = Val;                                    // Maj
+      rgbf_color[2] = Val * (100 - Sat) / 100;         // Min
       break;
     case 4:   // Range 4    HSV[0]=144 to 162...  RGB - {XX, 255, 0}    (Mid, Maj, Min)
-      rgbf_color[0] = Val * (255 - Sat * (6.737 * (Hue - 86.3) - 255) / 100) / 100; // Mid
-      rgbf_color[1] = Val * 2.55;                                     // Maj
-      rgbf_color[2] = Val * (255 * (100 - Sat) / 100) / 100;          // Min
+      rgbf_color[0] = Val * (255 - Sat * (6.737 * (Hue - 86.3) - 255) / 100) / 255; // Mid
+      rgbf_color[1] = Val;                                     // Maj
+      rgbf_color[2] = Val * (100 - Sat) / 100;          // Min
       break;
     case 5:     // Range 5    HSV[0]=163 to 200    RGB - {0, 255, xx}    (Min, Maj, Mid)
       rgbf_color[0] = Val * ( 255 * (100 - Sat) / 100) / 100;       // Min
-      rgbf_color[1] = Val * 2.55;                                   // Maj
-      rgbf_color[2] = Val * (255 - Sat * (1342.18 - 6.711 * Hue) / 100) / 100; // Mid
+      rgbf_color[1] = Val;                                   // Maj
+      rgbf_color[2] = Val * (255 - Sat * (1342.18 - 6.711 * Hue) / 100) / 255; // Mid
       break;
     case 6:       // Range 6    HSV[0]=201-230    RGB - {0, xx, 255}     (Min, Mid, Maj)
-      rgbf_color[0] = Val * (255 * (100 - Sat) / 100) / 100;       // Min
-      rgbf_color[1] = Val * (255 - Sat * (4.233 * Hue - 846.6) / 100) / 100; // Mid
-      rgbf_color[2] = Val * 2.55;                                  // Maj
+      rgbf_color[0] = Val * (100 - Sat) / 100;       // Min
+      rgbf_color[1] = Val * (255 - Sat * (4.233 * Hue - 846.6) / 100) / 255; // Mid
+      rgbf_color[2] = Val;                                  // Maj
       break;
     case 7:       // Range 7    HSV[0]=231-254    RGB - {0, xx, 255}     (Min, Mid, Maj)
-      rgbf_color[0] = Val * (255 * (100 - Sat) / 100) / 100;       // Min
-      rgbf_color[1] = Val * (255 - Sat * (5.333 * Hue - 1099.59) / 100) / 100; // Mid
-      rgbf_color[2] = Val * 2.55;                                  // Maj
+      rgbf_color[0] = Val * (100 - Sat) / 100;       // Min
+      rgbf_color[1] = Val * (255 - Sat * (5.333 * Hue - 1099.59) / 100) / 255; // Mid
+      rgbf_color[2] = Val;                                  // Maj
       break;
     case 8:        //Range 8   HSV[0]=255 to 286...  RGB - {xx, 0, 255}     (Mid, Min, Maj)
-      rgbf_color[0] = Val * (255 - Sat * (1271 - 4 * Hue) / 100) / 100; // Mid
-      rgbf_color[1] = Val * (255 * (100 - Sat) / 100) / 100;        // Min
-      rgbf_color[2] = Val * 2.55;                                   // Maj
+      rgbf_color[0] = Val * (255 - Sat * (1271 - 4 * Hue) / 100) / 255; // Mid
+      rgbf_color[1] = Val * (100 - Sat) / 100;        // Min
+      rgbf_color[2] = Val;                                   // Maj
       break;
     case 9:       // Range 9    HSV[0]=287 to 328...  RGB - {xx, 0, 255}     (Mid, Min, Maj)
-      rgbf_color[0] = Val * (255 - Sat * (991.86 - 3.024 * Hue) / 100) / 100; // Mid
-      rgbf_color[1] = Val * (255 * (100 - Sat) / 100) / 100;         // Min
-      rgbf_color[2] = Val * 2.55;                                    // Maj
+      rgbf_color[0] = Val * (255 - Sat * (991.86 - 3.024 * Hue) / 100) / 255; // Mid
+      rgbf_color[1] = Val * (100 - Sat) / 100;         // Min
+      rgbf_color[2] = Val;                                    // Maj
       break;
     case 10:     // Range 10    HSV[0]=329 to 347    RGB - {255, 0, xx}    (Maj, Min, Mid)
-      rgbf_color[0] = Val * 2.55;                                   // Min
-      rgbf_color[1] = Val * (255 * (100 - Sat) / 100) / 100;        // Maj
-      rgbf_color[2] = Val * (255 - Sat * (6.684 * Hue - 2192.35) / 100) / 100; // Mid
+      rgbf_color[0] = Val;                                   // Min
+      rgbf_color[1] = Val * (100 - Sat) / 100;        // Maj
+      rgbf_color[2] = Val * (255 - Sat * (6.684 * Hue - 2192.35) / 100) / 255; // Mid
       break;
     case 11:       // Range 11    HSV[0]=348 TO 360   RGB - {255, 0, xx}    (Maj, Min, Mid)
-      rgbf_color[0] = Val * 2.55;                                   // Min
-      rgbf_color[1] = Val * (255 * (100 - Sat) / 100) / 100;        // Maj
-      rgbf_color[2] = Val * (255 - Sat * (9.846 * Hue - 3289.56) / 100) / 100; // Mid
+      rgbf_color[0] = Val;                                   // Min
+      rgbf_color[1] = Val * (100 - Sat) / 100;        // Maj
+      rgbf_color[2] = Val * (255 - Sat * (9.846 * Hue - 3289.56) / 100) / 255; // Mid
       break;
   }
 }
