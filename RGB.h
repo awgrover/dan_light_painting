@@ -1,3 +1,5 @@
+#pragma once
+
 /*
   Instead of a 3 element array, use a struct with named fields.
   Provides:

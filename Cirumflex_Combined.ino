@@ -4,12 +4,16 @@ const int BRIGHTNESS = 1;      // Value pot pin number
 const int SLOWNESS = 3;        // Pot pin number; 0 is fast, 1023 is slow.
 
 // Which LED interface?
-#include "PWM_TLC59711.h"
-PWM_TLC59711 PWM;
+//#include "PWM_TLC59711.h"
+//PWM_TLC59711 PWM;
 /* 
   #include "PWM_NativePin.h"
   PWM_NativePin PWM;
 */
+ 
+  #include "PWM_NeoPixel.h"
+  PWM_NeoPixel PWM;
+
 
 // Pins for LEDs in each zone
 // You have to go look in the PWM class to figure out the physical pin
@@ -44,7 +48,6 @@ float BfiniHSV[3] = {60, 0, 50} ;
 float CfiniHSV[3] = {60, 0, 50} ;
 float DfiniHSV[3] = {60, 0, 50} ;
 float *finiHSV[4] = {AfiniHSV, BfiniHSV, CfiniHSV, DfiniHSV};
-int *zoneNum[4] = {0, 1, 2, 3};
 byte Asectors[3] = {1, 6, 5} ;            // Sector-arrays for each zone.
 byte Bsectors[3] = {2, 6, 5} ;   // Change sector names to (0, 1, 2, 3, 4, 5)
 byte Csectors[3] = {4, 6, 5} ;
@@ -72,6 +75,10 @@ void setup() {
     PWM.begin(dLunitPins[led]);
   }
 
+  Serial.println("Pixel demo...");
+  PWM.demo(); // show something predictable at startup
+  Serial.println("Pixel demo done");
+  
   pinMode(BRIGHTNESS, INPUT);        // pin 1 is the Value (value) knob.
   pinMode(SLOWNESS, INPUT);          // pin 3 is the slowness knob.
 
