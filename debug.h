@@ -11,4 +11,5 @@
   #define debugln() Serial.println();
 #else
   #define debug(x)
+  #define debugln()
 #endif

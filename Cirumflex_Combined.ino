@@ -10,16 +10,16 @@ const int SLOWNESS = -1;        // e.g. A1. Pot pin number; 0 is fast, 1023 is s
 const float SLOWNESS_OVERRIDE = 1; // if pin == -1, use this as slowness
 
 // Which LED interface?
-//#include "PWM_TLC59711.h"
-//PWM_TLC59711 PWM;
+#include "PWM_TLC59711.h"
+PWM_TLC59711 PWM;
 /* 
   #include "PWM_NativePin.h"
   PWM_NativePin PWM;
 */
- 
+/* 
   #include "PWM_NeoPixel.h"
   PWM_NeoPixel PWM;
-
+*/
 
 // Pins for LEDs in each zone
 // You have to go look in the PWM class to figure out the physical pin
@@ -84,7 +84,7 @@ void setup() {
   }
 
   Serial.println("Pixel demo...");
-  PWM.demo(); // show something predictable at startup
+  //PWM.demo(); // show something predictable at startup
   Serial.println("Pixel demo done");
   
   pinMode(BRIGHTNESS, INPUT);        // pin 1 is the Value (value) knob.
