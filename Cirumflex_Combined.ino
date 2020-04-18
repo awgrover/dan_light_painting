@@ -2,9 +2,10 @@
 
 //Fixed colors set as globals. 03-Pattern fades between them.
 const int RANDOMnoisePIN = A5; // for random seed
-const int BRIGHTNESS = -1;      // Value pot pin number; use -1 for no pot
-const float BrightnessOverride = 0.2; // if pin == -1, use this as brightness
-const int SLOWNESS = A2;        // Pot pin number; 0 is fast, 1023 is slow.
+const int BRIGHTNESS = -1;      // e/g. A0. Value pot pin number; use -1 for no pot
+const float BRIGHTNESS_OVERRIDE = 0.2; // e.g. A0. if pin == -1, use this as brightness
+const int SLOWNESS = -1;        // e.g. A1. Pot pin number; 0 is fast, 1023 is slow.
+const float SLOWNESS_OVERRIDE = 1; // if pin == -1, use this as slowness
 
 // Which LED interface?
 //#include "PWM_TLC59711.h"
@@ -141,7 +142,7 @@ void loop() {
       break;
 
   }
-  delayKnob(2000);
+  delayKnob(2000); // FIXME: does nothing?
 
   // pattern03_FixedColorWalk();
   // pattern04_CustomFades ();
