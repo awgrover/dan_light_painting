@@ -73,6 +73,7 @@ void setup() {
   Serial.begin(115200);
   debug(F("Debug on\n"));
   Serial.print(F("Pot for brightness on "));Serial.println(BRIGHTNESS);
+  Serial.print(F("Pot for slowness on "));Serial.println(SLOWNESS);
   
   randomSeed(analogRead(RANDOMnoisePIN));
 
