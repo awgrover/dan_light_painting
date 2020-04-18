@@ -1,3 +1,5 @@
+// Uncomment to turn on, Comment to turn off debug() output:
+//#define DEBUG
 #include "debug.h"
 
 //Fixed colors set as globals. 03-Pattern fades between them.

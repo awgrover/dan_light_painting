@@ -2,7 +2,7 @@
 // and easily turn it off everywhere
 
 // Uncomment to turn on, Comment to turn off:
-#define DEBUG
+//#define DEBUG
 
 // FIXME: use the template style so we get formatting args
 
