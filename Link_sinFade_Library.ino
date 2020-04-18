@@ -43,7 +43,7 @@ void HSV_sinFade_Retain_1Z (float Steps, int fadeZone, float startHSV[], float H
   for (int Stepr = 0; Stepr <= Steps; Stepr++) {    ///////////// <<<<<<<<<<<<  START FADE
 
     ValKnob = brightness();
-    //<< Knob reads value 0 to 1023.
+
     localHSV[0] = startHSV[0] + (1 - cos(radians(Stepr * 180.0 / Steps))) * HueDegrees / 2 ;
     localHSV[1] = startHSV[1] + (1 - cos(radians(Stepr * 180.0 / Steps))) * (newSat - startHSV[1]) / 2 ;
     // value, so brightness goes here (fixme: move to the PWM class)
