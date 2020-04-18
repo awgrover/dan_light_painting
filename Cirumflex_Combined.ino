@@ -1,7 +1,10 @@
+#include "debug.h"
+
 //Fixed colors set as globals. 03-Pattern fades between them.
 const int RANDOMnoisePIN = A5; // for random seed
-const int BRIGHTNESS = 1;      // Value pot pin number
-const int SLOWNESS = 3;        // Pot pin number; 0 is fast, 1023 is slow.
+const int BRIGHTNESS = -1;      // Value pot pin number; use -1 for no pot
+const float BrightnessOverride = 0.2; // if pin == -1, use this as brightness
+const int SLOWNESS = A2;        // Pot pin number; 0 is fast, 1023 is slow.
 
 // Which LED interface?
 //#include "PWM_TLC59711.h"
@@ -64,8 +67,10 @@ byte ZoneSet[4] = {1, 2, 3, 4}; // >>>change to: byte ZoneSet[4] = {0, 1, 2, 3};
 /////////////////////////////////////////////////////////////////////////
 
 void setup() {
-  Serial.begin(9600);
-
+  Serial.begin(115200);
+  debug(F("Debug on\n"));
+  Serial.print(F("Pot for brightness on "));Serial.println(BRIGHTNESS);
+  
   randomSeed(analogRead(RANDOMnoisePIN));
 
   for (byte led = 0; led < 3; led++) {
