@@ -1,3 +1,5 @@
+/* Compile test, not used in running code */
+
 void other_ttttest(RGB<int> &my_rgb);
 
 void ttttest() {
@@ -19,7 +21,8 @@ void ttttest() {
     {55,66,77},
     {4.5, 6.3, 88.8}
     };
-
+  if( rgb_a) {} // prevent unused warning
+  
   }
 
 void other_ttttest(RGB<int> &my_rgb) {

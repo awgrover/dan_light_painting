@@ -1,7 +1,13 @@
+// Uncomment to turn on, Comment to turn off debug() output:
+//#define DEBUG
+#include "debug.h"
+
 //Fixed colors set as globals. 03-Pattern fades between them.
 const int RANDOMnoisePIN = A5; // for random seed
-const int BRIGHTNESS = 1;      // Value pot pin number
-const int SLOWNESS = 3;        // Pot pin number; 0 is fast, 1023 is slow.
+const int BRIGHTNESS = -1;      // e/g. A0. Value pot pin number; use -1 for no pot
+const float BRIGHTNESS_OVERRIDE = 0.2; // e.g. A0. if pin == -1, use this as brightness
+const int SLOWNESS = -1;        // e.g. A1. Pot pin number; 0 is fast, 1023 is slow.
+const float SLOWNESS_OVERRIDE = 1; // if pin == -1, use this as slowness
 
 // Which LED interface?
 #include "PWM_TLC59711.h"
@@ -9,6 +15,10 @@ PWM_TLC59711 PWM;
 /* 
   #include "PWM_NativePin.h"
   PWM_NativePin PWM;
+*/
+/* 
+  #include "PWM_NeoPixel.h"
+  PWM_NeoPixel PWM;
 */
 
 // Pins for LEDs in each zone
@@ -44,7 +54,6 @@ float BfiniHSV[3] = {60, 0, 50} ;
 float CfiniHSV[3] = {60, 0, 50} ;
 float DfiniHSV[3] = {60, 0, 50} ;
 float *finiHSV[4] = {AfiniHSV, BfiniHSV, CfiniHSV, DfiniHSV};
-int *zoneNum[4] = {0, 1, 2, 3};
 byte Asectors[3] = {1, 6, 5} ;            // Sector-arrays for each zone.
 byte Bsectors[3] = {2, 6, 5} ;   // Change sector names to (0, 1, 2, 3, 4, 5)
 byte Csectors[3] = {4, 6, 5} ;
@@ -61,8 +70,11 @@ byte ZoneSet[4] = {1, 2, 3, 4}; // >>>change to: byte ZoneSet[4] = {0, 1, 2, 3};
 /////////////////////////////////////////////////////////////////////////
 
 void setup() {
-  Serial.begin(9600);
-
+  Serial.begin(115200);
+  debug(F("Debug on\n"));
+  Serial.print(F("Pot for brightness on "));Serial.println(BRIGHTNESS);
+  Serial.print(F("Pot for slowness on "));Serial.println(SLOWNESS);
+  
   randomSeed(analogRead(RANDOMnoisePIN));
 
   for (byte led = 0; led < 3; led++) {
@@ -72,6 +84,10 @@ void setup() {
     PWM.begin(dLunitPins[led]);
   }
 
+  Serial.println("Pixel demo...");
+  //PWM.demo(); // show something predictable at startup
+  Serial.println("Pixel demo done");
+  
   pinMode(BRIGHTNESS, INPUT);        // pin 1 is the Value (value) knob.
   pinMode(SLOWNESS, INPUT);          // pin 3 is the slowness knob.
 
@@ -129,7 +145,7 @@ void loop() {
       break;
 
   }
-  delayKnob(2000);
+  delayKnob(2000); // FIXME: does nothing?
 
   // pattern03_FixedColorWalk();
   // pattern04_CustomFades ();

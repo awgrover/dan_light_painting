@@ -1,27 +1,32 @@
 // Library of sinFade functions
 // Items in the commented heading below must be included in the linked sketch.
-/*  
-const int BRIGHTNESS = 1;      // Value pot pin number
-const int SLOWNESS = 3;        // pot: 0 is fast, 1023 is slow. pot pin number
+/*
+  #include "debug.h"
 
-// Which LED interface?
-#include "PWM_TLC59711.h"
-PWM_TLC59711 PWM;
-// OR
+  const int BRIGHTNESS = A0;      // e/g. A0. Value pot pin number; use -1 for no pot
+  const float BRIGHTNESS_OVERRIDE = 0.2; // e.g. A0. if pin == -1, use this as brightness
+  const int SLOWNESS = A1;        // e.g. A1. Pot pin number; 0 is fast, 1023 is slow.
+  const float SLOWNESS_OVERRIDE = 1; // if pin == -1, use this as slowness
+
+  // Which LED interface?
+  #include "PWM_TLC59711.h"
+  PWM_TLC59711 PWM;
+  // OR
   #include "PWM_NativePin.h"
   PWM_NativePin PWM;
 
-// Pins for each zone, using logical pins from the PWM set (see .h above)
-const byte aLunitPins[3] = {PWM.pwm12, PWM.pwm11, PWM.pwm10};    // Zone A    >> Zone 1   {R, G, B}
-const byte bLunitPins[3] = {PWM.pwm1, PWM.pwm2, PWM.pwm3};       // Zone B    >> Zone 2   {R, G, B}
-const byte cLunitPins[3] = {PWM.pwm7, PWM.pwm8, PWM.pwm9};      // Zone C    >> Zone 3   {R, G, B}
-const byte dLunitPins[3] = {PWM.pwm6, PWM.pwm5, PWM.pwm4};       // Zone D    >> Zone 4   {R, G, B}
-const byte *LunitZones[3] = {aLunitPins, bLunitPins, cLunitPins}; // <<< fadeZone = 0, 1, 2.
+  // Pins for each zone, using logical pins from the PWM set (see .h above)
+  const byte aLunitPins[3] = {PWM.pwm12, PWM.pwm11, PWM.pwm10};    // Zone A    >> Zone 1   {R, G, B}
+  const byte bLunitPins[3] = {PWM.pwm1, PWM.pwm2, PWM.pwm3};       // Zone B    >> Zone 2   {R, G, B}
+  const byte cLunitPins[3] = {PWM.pwm7, PWM.pwm8, PWM.pwm9};      // Zone C    >> Zone 3   {R, G, B}
+  const byte dLunitPins[3] = {PWM.pwm6, PWM.pwm5, PWM.pwm4};       // Zone D    >> Zone 4   {R, G, B}
+  const byte *LunitZones[3] = {aLunitPins, bLunitPins, cLunitPins}; // <<< fadeZone = 0, 1, 2.
 
-// Percent scaling for R vs G vs B for "White Balance" empirical values for LED strips.
-const float GrnScaler = 77.0;   // <<Wht balance Entrance.  << 9/2018 - 80% 75%
-const float BluScaler = 57.0;   // <<Wht balance Entrance.  << 9/2018 - 65% 55%
+  // Percent scaling for R vs G vs B for "White Balance" empirical values for LED strips.
+  const float GrnScaler = 77.0;   // <<Wht balance Entrance.  << 9/2018 - 80% 75%
+  const float BluScaler = 57.0;   // <<Wht balance Entrance.  << 9/2018 - 65% 55%
 *////
+
 
 //////////////////////////////////////////
 void HSV_sinFade_Retain_1Z (float Steps, int fadeZone, float startHSV[], float HueDegrees, int newSat, int newVal) {
@@ -37,10 +42,8 @@ void HSV_sinFade_Retain_1Z (float Steps, int fadeZone, float startHSV[], float H
 
   for (int Stepr = 0; Stepr <= Steps; Stepr++) {    ///////////// <<<<<<<<<<<<  START FADE
 
-    if (! (Stepr % 10) ) {          // modulo operator % returns the remainder, e.g.: 10 % 2 = 0. 10 % 3 = 1.
-      // FIXME: should this be a map()? looks like a 0..1
-      ValKnob = analogRead(BRIGHTNESS) / 1043.9 + 0.02;            // analogRead is slow, so do every 10th
-    }                                                              //<< Knob reads value 0 to 1023.
+    ValKnob = brightness();
+
     localHSV[0] = startHSV[0] + (1 - cos(radians(Stepr * 180.0 / Steps))) * HueDegrees / 2 ;
     localHSV[1] = startHSV[1] + (1 - cos(radians(Stepr * 180.0 / Steps))) * (newSat - startHSV[1]) / 2 ;
     // value, so brightness goes here (fixme: move to the PWM class)
@@ -86,9 +89,8 @@ void HSV_sinFade_Retain_2Z(float Steps,
   float ValKnob;                   //  << Variable for Brightness knob.
 
   for (int Stepr = 0; Stepr <= Steps; Stepr++) {    ///////////// <<<<<<<<<<<<  START FADE
-    if (! (Stepr % 10) ) {          // modulo operator % returns the remainder, e.g.: 10 % 2 = 0. 10 % 3 = 1.
-      ValKnob = analogRead(BRIGHTNESS) / 1043.9 + 0.02;            // analogRead is slow, so do every 10th
-    }                                                              //<< Knob reads value 0 to 1023.
+    ValKnob = brightness();
+
     localHSV1[0] = startHSV1[0] + (1 - cos(radians(Stepr * 180.0 / Steps))) * HueDegrees1 / 2 ;
     localHSV1[1] = startHSV1[1] + (1 - cos(radians(Stepr * 180.0 / Steps))) * (newSat1 - startHSV1[1]) / 2 ;
     localHSV1[2] = (startHSV1[2] + (1 - cos(radians(Stepr * 180.0 / Steps))) * (newVal1 - startHSV1[2]) / 2 ) * ValKnob  ;
@@ -135,9 +137,8 @@ void HSVtoHSV_sinFade_Retain_1Z(float Steps, int fadeZone, float startHSV[], flo
   float localHSV[3];
   float ValKnob;   //  << Variable for Brightness knob.
   for (int Stepr = 0; Stepr <= Steps; Stepr++) {              ///////////// <<<<<<<<<<<<  START FADE ...  START FADE  one extra on purpose.
-    if (! (Stepr % 10) ) {                                    // modulo operator % returns the remainder, e.g.: 10 % 2 = 0. 10 % 3 = 1.
-      ValKnob = analogRead(BRIGHTNESS) / 1043.9 + 0.02;          // analogRead is slow, so do every 10th   //<< Knob reads value 0 to 1023.
-    }
+    ValKnob = brightness();
+
     localHSV[0] = startHSV[0] + (1 - cos(radians(Stepr * 180.0 / Steps))) * HueDiff / 2 ;
     localHSV[1] = startHSV[1] + (1 - cos(radians(Stepr * 180.0 / Steps))) * (newHSV[1] - startHSV[1]) / 2 ;
     localHSV[2] = (startHSV[2] + (1 - cos(radians(Stepr * 180.0 / Steps))) * (newHSV[2] - startHSV[2]) / 2 ) * ValKnob ;
@@ -182,9 +183,8 @@ void HSVtoHSV_sinFade_Retain_2Z(float Steps, int fadeZone1, float startHSV1[], f
   float localHSV2[3];
   float ValKnob;   //  << Variable for Brightness knob.
   for (int Stepr = 0; Stepr <= Steps; Stepr++) {              ///////////// <<<<<<<<<<<<  START FADE ...  START FADE  one extra on purpose.
-    if (! (Stepr % 10) ) {                                    // modulo operator % returns the remainder, e.g.: 10 % 2 = 0. 10 % 3 = 1.
-      ValKnob = analogRead(BRIGHTNESS) / 1043.9 + 0.02;          // analogRead is slow, so do every 10th   //<< Knob reads value 0 to 1023.
-    }
+    ValKnob = brightness();
+
     localHSV1[0] = startHSV1[0] + (1 - cos(radians(Stepr * 180.0 / Steps))) * HueDiff1 / 2 ;
     localHSV1[1] = startHSV1[1] + (1 - cos(radians(Stepr * 180.0 / Steps))) * (newHSV1[1] - startHSV1[1]) / 2 ;
     localHSV1[2] = (startHSV1[2] + (1 - cos(radians(Stepr * 180.0 / Steps))) * (newHSV1[2] - startHSV1[2]) / 2 ) * ValKnob ;
@@ -240,12 +240,21 @@ void HSVcheckLimits(float hsvArray[])  {
 //////////////////////////////////////////
 void HSVwriteToLEDs(float someHSV[], int someZone) {  // <<< Includes whiteBalance.
   float RGB_from_hsv[3];
+
   HSVehtoRGB(someHSV, RGB_from_hsv);              // Convert HSV to RGB on every iteration.
 
   //"White balance" is applied to the RGB form of the color HERE. Use RedScaler if needed.
   // colorRGB[0] = rgbf_color[0] * RedScaler / 100.0;  // RedScaler = 100   //  100.0
   RGB_from_hsv[1] = RGB_from_hsv[1] * GrnScaler / 100.0;  // GrnScaler = 77    //  67.0
   RGB_from_hsv[2] = RGB_from_hsv[2] * BluScaler / 100.0;  // BluScaler = 57    //  37.0
+
+
+  debug(F("B ")); debug(brightness()); debug(F(" "));
+  debug(F("@ ")); debug(someZone);
+  debug(F(" V ")); debug( someHSV[2] );
+  debug(F(" G ")); debug( RGB_from_hsv[1] ); // amplitude should track V
+  debugln();
+
 
   for (byte led = 0; led < 3; led++) {
     PWM.set(LunitZones[someZone][led], RGB_from_hsv[led]);  // Display color step.
@@ -397,16 +406,46 @@ void ArrayPrintFloat(float Array[]) {  // Prints any array of three elements.
 }
 //////////////////////////////////////////
 int delayKnob(float delayNum ) {                  //**** consider the map()     // map( analogRead(),   0,1023, 10,940)
-  float knobvalue = (analogRead(SLOWNESS) / 110.0) + 0.1;        // analogRead(3) = 0 to 1023.
-  int delayout = delayNum * knobvalue;                           // delayKnob(100) = 10 to 940.
-  return delayout;                                   // 'return' is not a function... It is an statement - no paren needed.
+  static unsigned long last = 0;
+  static int delay_f;
+
+  if ( millis() - last > 100 ) {
+    float knobvalue = (analogRead(SLOWNESS) / 110.0) + 0.1;        // analogRead(3) = 0 to 1023.
+    if (BRIGHTNESS == -1) knobvalue = SLOWNESS_OVERRIDE ; // override, force mid speed
+    delay_f = delayNum * knobvalue;   // delayKnob(100) = 10 to 940.
+    last = millis();
+  }
+
+  return delay_f;
+
 }
 
 //////////////////////////////////////
 int delayKnobNEW(float delayNum ) {
-  float knobvalue = (analogRead(SLOWNESS) /330.0) + 0.1;        // analogRead(3) = 0 to 1023.
+  float knobvalue = (analogRead(SLOWNESS) / 330.0) + 0.1;       // analogRead(3) = 0 to 1023.
   int delayout = delayNum * knobvalue;                           // delayKnob(100) = 10 to 320.
   return delayout;                                   // 'return' is not a function... It is an statement - no paren needed.
+
+}
+
+//////////////////////////////////////
+float brightness() {
+  // Needs the BRIGHTNESS pin, a pot
+  // Calibrated.
+  // Isn't this the same as:
+  // map((float) analogRead(BRIGHTNESS), 0.2,1043.9, 0.0,1024.0 )
+
+  // analogRead is slow, so do every 1/10 sec
+  static unsigned long last = 0;
+  static float brightness_f;
+
+  if ( millis() - last > 100 ) {
+    brightness_f = analogRead(BRIGHTNESS) / 1043.9 + 0.02;
+    if (BRIGHTNESS == -1) brightness_f = BRIGHTNESS_OVERRIDE ; // override, force mid brightness
+    last = millis();
+  }
+
+  return brightness_f;
 }
 
 //////////////////////////////////////
@@ -425,5 +464,3 @@ void randomSectorArray(byte someSector[]) { // Creates a random array of sectors
   }
 }
 ///////////////////////////
-
-

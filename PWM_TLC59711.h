@@ -11,7 +11,7 @@ class PWM_TLC59711 : public PWM_Pins {
   // We use the default clock/data pins for SPI.
 
   public:
-    static constexpr int RANGE = 2^16 - 1;
+    static constexpr int RANGE =(2^16) - 1;
 
     // just do 1 for now
     Adafruit_TLC59711 tlc = Adafruit_TLC59711(NUM_TLC59711); // default spi clock/data
